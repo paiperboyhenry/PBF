@@ -1,0 +1,17 @@
+{% extends "admin/base.html" %}
+{% from "partials/admin_macros.html" import csrf %}
+{% block title %}Account{% endblock %}
+{% block content %}
+<header class="adm__head"><h1>Account</h1></header>
+<form method="post" class="card" style="max-width:34rem">
+  {{ csrf() }}
+  <div class="field"><label>Email</label><div>{{ admin.email }}</div></div>
+  <div class="field"><label for="nm">Display name</label><input class="input" id="nm" name="name" value="{{ admin.name }}" maxlength="80"></div>
+  <h2 class="adm__h2">Change password</h2>
+  <div class="field"><label for="c">Current password</label><input class="input" id="c" name="current" type="password" autocomplete="current-password" required></div>
+  <div class="field"><label for="n">New password <span class="opt">12+ characters, mixed case, with a number</span></label><input class="input" id="n" name="new" type="password" autocomplete="new-password" required minlength="12"></div>
+  <div class="field"><label for="cf">Repeat new password</label><input class="input" id="cf" name="confirm" type="password" autocomplete="new-password" required></div>
+  <button class="btn" type="submit">Update password</button>
+  <p class="muted" style="font-size:.85rem;margin-top:1rem">Changing your password signs you out everywhere else.</p>
+</form>
+{% endblock %}

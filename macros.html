@@ -1,0 +1,37 @@
+{% macro picture(img, sizes="100vw", alt="", cls="", loading="lazy", priority=False) -%}
+{%- if img -%}
+<img {% if cls %}class="{{ cls }}" {% endif %}src="{{ media_url(img.path, img.variants[-1]) }}"
+ srcset="{% for w in img.variants %}{{ media_url(img.path, w) }} {{ w }}w{% if not loop.last %}, {% endif %}{% endfor %}"
+ sizes="{{ sizes }}" width="{{ img.width }}" height="{{ img.height }}" alt="{{ alt or img.alt }}"
+ {% if priority %}fetchpriority="high" decoding="async"{% else %}loading="{{ loading }}" decoding="async"{% endif %}>
+{%- endif -%}
+{%- endmacro %}
+
+{% macro type_tag(project_type) -%}
+<span class="tag tag--{{ project_type }}">{{ project_type|type_label }}</span>
+{%- endmacro %}
+
+{% macro pcard(p, show_dept=False, preview=False) -%}
+<a class="pcard{% if p.status != 'published' %} pcard--draft{% endif %}" href="{{ url_for('public.project', slug=p.dept_slug, project_slug=p.slug) }}"
+   data-category="{{ p.category }}" data-cursor>
+  <div class="pcard__frame" style="--ar:{% if p.cover %}{{ p.cover.width }}/{{ p.cover.height }}{% else %}4/5{% endif %}">
+    {{ picture(p.cover, sizes="(min-width:1000px) 30vw, (min-width:600px) 45vw, 92vw") }}
+    <span class="pcard__view">View project <span class="arrow">→</span></span>
+  </div>
+  <div class="pcard__plaque">
+    <div>
+      <h3>{{ p.title }}</h3>
+      <p>{% if show_dept %}{{ p.dept_name }}{% elif p.category %}{{ p.category }}{% endif %}{% if p.client_name %} · {{ p.client_name }}{% endif %}{% if p.status != 'published' %} · DRAFT{% endif %}</p>
+    </div>
+    {{ type_tag(p.project_type) }}
+  </div>
+</a>
+{%- endmacro %}
+
+{% macro placeholder_wall(count=3, label="Content awaiting publication") -%}
+<div class="empty-wall" role="list">
+  {% for i in range(count) %}
+  <div class="ph" role="listitem" style="--ar:4/5"><span>{{ label }}</span></div>
+  {% endfor %}
+</div>
+{%- endmacro %}

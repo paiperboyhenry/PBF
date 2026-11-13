@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block page_id %}contact{% endblock %}
+{% block content %}
+<section class="phero wrap">
+  <p class="eyebrow muted" style="margin-bottom:1.4rem">Contact</p>
+  <h1>Let’s talk about your project.</h1>
+  <p class="lede">The fastest way to start is the project form. It takes a few minutes and gives us what we need to reply properly.</p>
+</section>
+<section class="wrap contact-grid">
+  <div>
+    <h2 class="section__title" style="margin-bottom:1.6rem">Reach us</h2>
+    <dl class="clist">
+      {% if site.contact_email %}<div><dt>Email</dt><dd><a href="mailto:{{ site.contact_email }}">{{ site.contact_email }}</a></dd></div>{% endif %}
+      {% if whatsapp_url %}<div><dt>WhatsApp</dt><dd><a href="{{ whatsapp_url }}?text={{ 'Hello PBF Studio, I’d like to talk about a project.'|urlencode }}" target="_blank" rel="noopener">{{ site.whatsapp_number }}</a></dd></div>{% endif %}
+      {% if site.instagram_url %}<div><dt>Instagram</dt><dd><a href="{{ site.instagram_url }}" target="_blank" rel="noopener me">{{ site.instagram_url|replace('https://','')|replace('http://','')|replace('www.','')|trim('/') }}</a></dd></div>{% endif %}
+      {% if site.tiktok_url %}<div><dt>TikTok</dt><dd><a href="{{ site.tiktok_url }}" target="_blank" rel="noopener me">{{ site.tiktok_url|replace('https://','')|replace('http://','')|replace('www.','')|trim('/') }}</a></dd></div>{% endif %}
+      <div><dt>Location</dt><dd>{{ site.location }}</dd></div>
+      <div><dt>International</dt><dd>{{ site.international_note }}</dd></div>
+      {% if not site.contact_email and not whatsapp_url %}<div><dt>Direct line</dt><dd class="pending">Use the project form and we’ll reply by email.</dd></div>{% endif %}
+    </dl>
+  </div>
+  <div>
+    <h2 class="section__title" style="margin-bottom:1.6rem">Start here</h2>
+    <p class="prose" style="margin-bottom:2rem">Tell us what you’re looking to create, improve or achieve. Share a budget range and timeline if you have them. If you don’t, that’s fine too.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:.8rem">
+      <a class="btn btn--red" href="{{ url_for('enquiry.form') }}">Start a project <span class="arrow">→</span></a>
+      {% if whatsapp_url %}<a class="btn btn--ghost" href="{{ whatsapp_url }}?text={{ 'Hello PBF Studio, I’d like to talk about a project.'|urlencode }}" target="_blank" rel="noopener">Chat on WhatsApp</a>{% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

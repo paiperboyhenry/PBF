@@ -1,0 +1,22 @@
+{% extends "admin/base.html" %}
+{% block title %}Enquiries{% endblock %}
+{% block content %}
+<header class="adm__head"><h1>Enquiries</h1><a class="btn btn--small btn--ghost" href="{{ url_for('admin.enquiries_csv') }}" data-no-transition>Export CSV</a></header>
+<div class="tabs" role="tablist" aria-label="Filter by status">
+  <a href="{{ url_for('admin.enquiries', q=term) }}" {% if not filter_status %}aria-current="true"{% endif %}>All <b>{{ counts.values()|sum }}</b></a>
+  {% for key, label in enquiry_statuses %}<a href="{{ url_for('admin.enquiries', status=key, q=term) }}" {% if filter_status == key %}aria-current="true"{% endif %}>{{ label }} <b>{{ counts.get(key, 0) }}</b></a>{% endfor %}
+</div>
+<form class="filterbar" method="get"><input type="hidden" name="status" value="{{ filter_status }}"><label class="sr-only" for="sq">Search</label><input class="input" id="sq" name="q" value="{{ term }}" placeholder="Search name, business, email or reference"><button class="btn btn--small">Search</button></form>
+{% if rows %}
+<div class="card card--flush"><table class="tbl tbl--rows"><thead><tr><th>Reference</th><th>From</th><th>Services</th><th>Budget</th><th>Status</th><th>Received</th></tr></thead><tbody>
+{% for e in rows %}<tr>
+  <td><a href="{{ url_for('admin.enquiry_detail', eid=e.id) }}"><strong>{{ e.ref }}</strong></a></td>
+  <td>{{ e.full_name }}{% if e.business_name %}<br><span class="muted">{{ e.business_name }}</span>{% endif %}</td>
+  <td class="muted">{{ (e.services|json_list)|join(', ')|excerpt(60) }}</td>
+  <td class="muted">{{ e.budget or '—' }}</td>
+  <td><span class="pill pill--{{ e.status }}">{{ status_labels[e.status] }}</span></td>
+  <td class="muted nowrap">{{ e.created_at|local_dt('%d %b, %H:%M') }}</td>
+</tr>{% endfor %}
+</tbody></table></div>
+{% else %}<div class="card"><p class="muted">No enquiries {% if filter_status or term %}match this filter{% else %}yet. They’ll appear here when someone submits the project form{% endif %}.</p></div>{% endif %}
+{% endblock %}

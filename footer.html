@@ -1,0 +1,44 @@
+{% from "partials/macros.html" import picture %}
+<footer class="site-footer on-dark">
+  <div class="wrap">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <div class="display">PBF<br>Studio</div>
+        <p>Independent Creative Studio<br>Nairobi, Kenya</p>
+        <p>{{ site.international_note }}</p>
+      </div>
+      <nav class="footer__col" aria-label="Explore">
+        <h2>Explore</h2>
+        <ul>
+          <li><a href="{{ url_for('public.about') }}">About</a></li>
+          <li><a href="{{ url_for('public.services') }}">Services</a></li>
+          <li><a href="{{ url_for('public.work') }}">Selected Work</a></li>
+          <li><a href="{{ url_for('public.contact') }}">Contact</a></li>
+          <li><a href="{{ url_for('public.home') }}" data-reception>Back to reception</a></li>
+        </ul>
+      </nav>
+      <nav class="footer__col" aria-label="Departments">
+        <h2>Departments</h2>
+        <ul>
+          {% for d in nav_departments %}<li><a href="{{ url_for('public.department', slug=d.slug) }}"><span class="num">{{ '%02d'|format(d.number) }}</span>{{ d.name }}</a></li>{% endfor %}
+        </ul>
+      </nav>
+      <div class="footer__col">
+        <h2>Contact</h2>
+        <ul>
+          {% if site.contact_email %}<li><a href="mailto:{{ site.contact_email }}">{{ site.contact_email }}</a></li>{% endif %}
+          {% if whatsapp_url %}<li><a href="{{ whatsapp_url }}" target="_blank" rel="noopener">WhatsApp</a></li>{% endif %}
+          {% if site.instagram_url %}<li><a href="{{ site.instagram_url }}" target="_blank" rel="noopener me">Instagram</a></li>{% endif %}
+          {% if site.tiktok_url %}<li><a href="{{ site.tiktok_url }}" target="_blank" rel="noopener me">TikTok</a></li>{% endif %}
+          <li>{{ site.location }}</li>
+          <li><a href="{{ url_for('enquiry.form') }}">Start a project →</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__tagline">A creative institution. Six departments. One vision.</div>
+    <div class="footer__bottom">
+      <span>© {{ year }} PBF Studio. All rights reserved.</span>
+      <span>Independent Creative Studio · Nairobi, Kenya</span>
+    </div>
+  </div>
+</footer>

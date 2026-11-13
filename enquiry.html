@@ -1,0 +1,61 @@
+{% extends "admin/base.html" %}
+{% from "partials/admin_macros.html" import csrf %}
+{% block title %}{{ e.ref }}{% endblock %}
+{% block content %}
+<header class="adm__head"><div><a class="muted" href="{{ url_for('admin.enquiries') }}">← Enquiries</a><h1>{{ e.ref }} · {{ e.full_name }}</h1></div>
+  <div class="actions"><span class="pill pill--{{ e.status }}">{{ status_labels[e.status] }}</span>
+    {% if wa %}<a class="btn btn--small btn--ghost" href="{{ wa }}" target="_blank" rel="noopener" data-no-transition>WhatsApp</a>{% endif %}
+    <a class="btn btn--small btn--red" href="mailto:{{ e.email }}?subject={{ ('Re: your PBF Studio enquiry ' ~ e.ref)|urlencode }}" data-no-transition>Reply by email</a></div></header>
+<div class="cols cols--wide">
+  <div>
+    <section class="card">
+      <h2 class="adm__h2">Contact</h2>
+      <dl class="clist">
+        <div><dt>Name</dt><dd>{{ e.full_name }}</dd></div>
+        {% if e.business_name %}<div><dt>Business</dt><dd>{{ e.business_name }}</dd></div>{% endif %}
+        <div><dt>Email</dt><dd><a href="mailto:{{ e.email }}">{{ e.email }}</a></dd></div>
+        <div><dt>WhatsApp</dt><dd>{{ e.whatsapp or '—' }}</dd></div>
+        <div><dt>Country</dt><dd>{{ e.country or '—' }}</dd></div>
+        <div><dt>Received</dt><dd>{{ e.created_at|local_dt('%A %d %B %Y, %H:%M') }} (Nairobi time)</dd></div>
+      </dl>
+    </section>
+    <section class="card">
+      <h2 class="adm__h2">Requirements</h2>
+      <dl class="clist">
+        <div><dt>Services</dt><dd>{{ services|join(', ') }}{% if e.service_other %} — {{ e.service_other }}{% endif %}</dd></div>
+        <div><dt>Budget</dt><dd>{{ e.budget or 'Not given' }}</dd></div>
+        <div><dt>Timeline</dt><dd>{{ e.timeline or 'Not given' }}</dd></div>
+      </dl>
+      <h3 class="eyebrow muted" style="margin:1.6rem 0 .8rem">Project description</h3>
+      <div class="prose" style="font-size:1.05rem">{{ e.description|paragraphs }}</div>
+      {% if e.extra_notes %}<h3 class="eyebrow muted" style="margin:1.6rem 0 .8rem">Additional notes</h3><div class="prose" style="font-size:1.05rem">{{ e.extra_notes|paragraphs }}</div>{% endif %}
+      {% if links %}<h3 class="eyebrow muted" style="margin:1.6rem 0 .8rem">Reference links</h3><ul class="list list--plain">{% for l in links %}<li><a href="{{ l }}" target="_blank" rel="noopener noreferrer nofollow">{{ l }}</a></li>{% endfor %}</ul>{% endif %}
+      {% if files %}<h3 class="eyebrow muted" style="margin:1.6rem 0 .8rem">Attachments</h3><ul class="list list--plain">{% for f in files %}<li><a href="{{ url_for('admin.enquiry_file', eid=e.id, fid=f.id) }}" data-no-transition>{{ f.original_name }}</a><span class="muted">{{ (f.size / 1024)|round|int }} KB</span></li>{% endfor %}</ul>{% endif %}
+    </section>
+  </div>
+  <div>
+    <section class="card">
+      <h2 class="adm__h2">Status</h2>
+      <form method="post" action="{{ url_for('admin.enquiry_status', eid=e.id) }}" class="stack">{{ csrf() }}
+        <div class="statusgrid">{% for key, label in enquiry_statuses %}<label class="option"><input type="radio" name="status" value="{{ key }}" {% if e.status == key %}checked{% endif %} data-autosubmit><span>{{ label }}</span></label>{% endfor %}</div>
+        <noscript><button class="btn btn--small">Update status</button></noscript>
+      </form>
+    </section>
+    <section class="card" id="notes">
+      <h2 class="adm__h2">Private notes</h2>
+      <p class="muted" style="font-size:.82rem;margin-top:-.4rem">Only visible to admins. Never shown to the client.</p>
+      <form method="post" action="{{ url_for('admin.enquiry_note_add', eid=e.id) }}" class="stack">{{ csrf() }}<label class="sr-only" for="nb">Note</label><textarea class="textarea" id="nb" name="body" required maxlength="4000" style="min-height:6rem" placeholder="Add a note…"></textarea><button class="btn btn--small">Add note</button></form>
+      {% if notes %}<ul class="notes">{% for n in notes %}<li><div>{{ n.body|paragraphs }}</div><span class="muted">{{ n.admin_name or n.admin_email or 'Admin' }} · {{ n.created_at|local_dt }}</span>
+        <form method="post" action="{{ url_for('admin.enquiry_note_delete', eid=e.id, nid=n.id) }}" class="inline">{{ csrf() }}<button class="linkbtn">Delete</button></form></li>{% endfor %}</ul>{% endif %}
+    </section>
+    <section class="card">
+      <h2 class="adm__h2">Delivery</h2>
+      <dl class="clist">
+        <div><dt>Client email</dt><dd>{{ {'sent':'Confirmation sent','failed':'Failed to send','queued':'Sending…','not_configured':'Email not configured'}.get(e.ack_status, e.ack_status) }}</dd></div>
+        <div><dt>Studio alert</dt><dd>{{ {'sent':'Sent','failed':'Failed to send','queued':'Sending…','not_configured':'No channel configured'}.get(e.notify_status, e.notify_status) }}</dd></div>
+      </dl>
+    </section>
+    <p><a class="muted" href="{{ url_for('admin.enquiry_delete', eid=e.id) }}">Delete this enquiry…</a></p>
+  </div>
+</div>
+{% endblock %}

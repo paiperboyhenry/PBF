@@ -1,0 +1,41 @@
+{% from "partials/admin_macros.html" import csrf %}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>{% block title %}Admin{% endblock %} — PBF Studio</title>
+<link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+<link rel="stylesheet" href="{{ static_v('css/site.css') }}">
+<link rel="stylesheet" href="{{ static_v('css/admin.css') }}">
+</head>
+<body class="adm {% block body_class %}{% endblock %}" style="padding-bottom:0">
+{% if admin %}
+<aside class="adm__side">
+  <a class="adm__logo" href="{{ url_for('admin.dashboard') }}"><span>PBF</span><i></i><small>Admin</small></a>
+  {% set ep = request.endpoint %}
+  <nav aria-label="Admin">
+    <a href="{{ url_for('admin.dashboard') }}" {% if ep == 'admin.dashboard' %}aria-current="page"{% endif %}>Overview</a>
+    <a href="{{ url_for('admin.projects') }}" {% if ep and ep.startswith('admin.project') %}aria-current="page"{% endif %}>Projects</a>
+    <a href="{{ url_for('admin.departments') }}" {% if ep and ep.startswith('admin.department') %}aria-current="page"{% endif %}>Departments</a>
+    <a href="{{ url_for('admin.enquiries') }}" {% if ep and ep.startswith('admin.enquir') %}aria-current="page"{% endif %}>Enquiries{% if new_enquiries %}<b class="adm__badge">{{ new_enquiries }}</b>{% endif %}</a>
+    <a href="{{ url_for('admin.site_settings') }}" {% if ep == 'admin.site_settings' %}aria-current="page"{% endif %}>Settings</a>
+    <a href="{{ url_for('admin.account') }}" {% if ep == 'admin.account' %}aria-current="page"{% endif %}>Account</a>
+  </nav>
+  <div class="adm__foot">
+    <a href="{{ url_for('public.home') }}" target="_blank" rel="noopener" data-no-transition>View site ↗</a>
+    <form method="post" action="{{ url_for('admin.logout') }}">{{ csrf() }}<button type="submit">Sign out</button></form>
+    <span>{{ admin.email }}</span>
+  </div>
+</aside>
+{% endif %}
+<main class="adm__main{% if not admin %} adm__main--bare{% endif %}" id="main">
+  {% with msgs = get_flashed_messages(with_categories=true) %}{% if msgs %}
+  <div class="flashes" role="status">{% for cat, m in msgs %}<div class="flash flash--{{ cat }}">{{ m }}</div>{% endfor %}</div>
+  {% endif %}{% endwith %}
+  {% block content %}{% endblock %}
+</main>
+<script src="{{ static_v('js/admin.js') }}" defer></script>
+</body>
+</html>

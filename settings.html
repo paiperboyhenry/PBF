@@ -1,0 +1,33 @@
+{% extends "admin/base.html" %}
+{% from "partials/admin_macros.html" import csrf %}
+{% block title %}Settings{% endblock %}
+{% macro er(n) %}{% if errors.get(n) %}<div class="err" role="alert">{{ errors[n] }}</div>{% endif %}{% endmacro %}
+{% block content %}
+<header class="adm__head"><h1>Settings</h1></header>
+<form method="post" class="card form" style="max-width:46rem" novalidate>
+  {{ csrf() }}
+  <h2 class="adm__h2">Contact details</h2>
+  <p class="muted" style="font-size:.85rem;margin-top:-.4rem">These appear on the public site. Leave a field empty to hide it. Nothing is shown until you add it.</p>
+  <div class="field{% if errors.get('contact_email') %} has-error{% endif %}"><label for="ce">Public email</label><input class="input" id="ce" name="contact_email" type="email" value="{{ s.contact_email }}">{{ er('contact_email') }}</div>
+  <div class="field{% if errors.get('whatsapp_number') %} has-error{% endif %}"><label for="wa">WhatsApp number <span class="opt">international format, e.g. +254…</span></label><input class="input" id="wa" name="whatsapp_number" type="tel" value="{{ s.whatsapp_number }}">{{ er('whatsapp_number') }}</div>
+  <div class="grid2">
+    <div class="field{% if errors.get('instagram_url') %} has-error{% endif %}"><label for="ig">Instagram link</label><input class="input" id="ig" name="instagram_url" value="{{ s.instagram_url }}" placeholder="https://instagram.com/…">{{ er('instagram_url') }}</div>
+    <div class="field{% if errors.get('tiktok_url') %} has-error{% endif %}"><label for="tt">TikTok link</label><input class="input" id="tt" name="tiktok_url" value="{{ s.tiktok_url }}" placeholder="https://tiktok.com/@…">{{ er('tiktok_url') }}</div>
+  </div>
+  <div class="grid2">
+    <div class="field"><label for="lo">Location</label><input class="input" id="lo" name="location" value="{{ s.location }}" maxlength="120"></div>
+    <div class="field"><label for="in">International enquiries note</label><input class="input" id="in" name="international_note" value="{{ s.international_note }}" maxlength="240"></div>
+  </div>
+
+  <h2 class="adm__h2">Enquiry notifications</h2>
+  <div class="field{% if errors.get('notify_email') %} has-error{% endif %}"><label for="ne">Send new-enquiry alerts to <span class="opt">falls back to the public email</span></label><input class="input" id="ne" name="notify_email" type="email" value="{{ s.notify_email }}">{{ er('notify_email') }}</div>
+  <ul class="list list--plain">
+    <li><span><span class="dot dot--{{ 'ok' if smtp else 'todo' }}"></span><strong>Email sending (SMTP)</strong><br><span class="muted">{{ 'Configured on the server.' if smtp else 'Not configured. Set SMTP_HOST and MAIL_FROM (plus SMTP_USER / SMTP_PASSWORD) in the server environment. Until then, enquiries are saved here but no email is sent.' }}</span></span></li>
+    <li><span><span class="dot dot--{{ 'ok' if webhook else 'todo' }}"></span><strong>Webhook alert (Slack, Discord, etc.)</strong><br><span class="muted">{{ 'Configured on the server.' if webhook else 'Optional. Set NOTIFY_WEBHOOK_URL in the server environment.' }}</span></span></li>
+  </ul>
+
+  <h2 class="adm__h2">Budget ranges</h2>
+  <div class="field{% if errors.get('budget_ranges') %} has-error{% endif %}"><label for="br">Options shown on the enquiry form <span class="opt">one per line · the budget step stays optional</span></label><textarea class="textarea" id="br" name="budget_ranges" style="min-height:12rem">{{ s.budget_ranges|join('\n') }}</textarea>{{ er('budget_ranges') }}</div>
+  <div class="formbar"><button class="btn btn--red" type="submit">Save settings</button></div>
+</form>
+{% endblock %}

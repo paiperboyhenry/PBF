@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block page_id %}services{% endblock %}
+{% block content %}
+<section class="phero wrap">
+  <p class="eyebrow muted" style="margin-bottom:1.4rem">Services</p>
+  <h1>Six departments. One studio.</h1>
+  <p class="lede">Strategy, identity, digital, image-making, space and fashion. Brought together by one independent studio, so the work holds together from the first idea to the last detail.</p>
+</section>
+<section class="section wrap" style="padding-top:0">
+  {% for d in departments %}
+  <article class="svc" id="{{ d.slug }}">
+    <div class="svc__n" aria-hidden="true">{{ '%02d'|format(d.number) }}</div>
+    <div class="svc__d">
+      <h2>{{ d.name }}</h2>
+      <p>{{ d.description }}</p>
+      <div style="display:flex;flex-wrap:wrap;gap:1.4rem;margin-top:1.4rem">
+        <a class="link" href="{{ url_for('public.department', slug=d.slug) }}">Visit department <span class="arrow">→</span></a>
+        <a class="link" href="{{ url_for('enquiry.form', department=d.slug) }}">Start a project <span class="arrow">→</span></a>
+      </div>
+    </div>
+    <ul class="svc-list">{% for s in d.services %}<li>{{ s }}</li>{% endfor %}</ul>
+  </article>
+  {% endfor %}
+</section>
+<section class="band on-dark">
+  <div class="wrap cta-band">
+    <h2>Not sure which department you need?</h2>
+    <a class="btn btn--red" href="{{ url_for('enquiry.form') }}">Tell us about your project <span class="arrow">→</span></a>
+  </div>
+</section>
+{% endblock %}

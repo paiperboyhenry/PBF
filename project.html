@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import picture, type_tag, pcard %}
+{% block page_id %}project{% endblock %}
+{% block body_class %}theme-{{ dept.theme }}{% endblock %}
+{% block content %}
+{% if preview %}
+<div class="preview-bar" style="top:var(--header-h)">
+  <span>Draft preview · not visible to the public</span>
+  <span style="display:flex;gap:1.2rem;flex-wrap:wrap">
+    <a href="{{ url_for('admin.project_edit', pid=project.id) }}">Back to editor</a>
+    <form method="post" action="{{ url_for('admin.project_publish', pid=project.id) }}" style="display:inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="link" style="background:none;border:0;border-bottom:1px solid;padding-bottom:.2rem;cursor:pointer;color:inherit">Publish</button></form>
+  </span>
+</div>
+{% endif %}
+<article>
+  <header class="phead wrap">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="{{ url_for('public.warehouse') }}">Warehouse</a><span>/</span><a href="{{ url_for('public.department', slug=dept.slug) }}">{{ dept.name }}</a>{% if project.category %}<span>/</span><span>{{ project.category }}</span>{% endif %}</nav>
+    <div>{{ type_tag(project.project_type) }}</div>
+    <h1>{{ project.title }}</h1>
+    <dl class="pmeta">
+      {% if project.client_name %}<div><dt>{{ 'Client' if project.project_type == 'client' else 'Brand' }}</dt><dd>{{ project.client_name }}</dd></div>{% endif %}
+      <div><dt>Department</dt><dd><a href="{{ url_for('public.department', slug=dept.slug) }}">{{ '%02d'|format(dept.number) }} — {{ dept.name }}</a></dd></div>
+      {% if project.category %}<div><dt>Category</dt><dd>{{ project.category }}</dd></div>{% endif %}
+      {% if project.project_date %}<div><dt>Date</dt><dd>{{ project.project_date|month_year }}</dd></div>{% endif %}
+      <div><dt>Project type</dt><dd>{{ type_labels[project.project_type] }}</dd></div>
+    </dl>
+  </header>
+
+  {% if project.cover %}
+  <div class="wrap"><div class="pcover reveal">{{ picture(project.cover, sizes="100vw", alt=project.cover.alt or project.title, loading="eager", priority=True) }}</div></div>
+  {% endif %}
+
+  <div class="wrap pbody">
+    <div>
+      <h2>About this project</h2>
+      {% if project.project_type == 'concept' %}<p class="muted" style="font-size:.9rem;max-width:20rem"><strong>Concept project.</strong> Created as a creative exploration, not for a paying client.</p>
+      {% elif project.project_type == 'personal' %}<p class="muted" style="font-size:.9rem;max-width:20rem"><strong>Personal experiment.</strong> Self-initiated work.</p>{% endif %}
+      {% if project.external_url %}<p style="margin-top:1.4rem"><a class="link" href="{{ project.external_url }}" target="_blank" rel="noopener noreferrer">Visit project <span class="arrow">↗</span></a></p>{% endif %}
+      {% if project.services %}
+      <h2 style="margin-top:2.4rem">Services delivered</h2>
+      <ul class="pservices">{% for s in project.services %}<li>{{ s }}</li>{% endfor %}</ul>
+      {% endif %}
+    </div>
+    <div class="prose">{% if project.description %}{{ project.description|paragraphs }}{% else %}<p class="muted">A full description for this project is coming soon.</p>{% endif %}</div>
+  </div>
+
+  {% if videos %}
+  <div class="wrap">
+    {% for v in videos %}
+    <div class="pvideo reveal">
+      {% if v.kind == 'upload' %}<video controls preload="metadata" playsinline src="{{ media_url(v.url) }}" aria-label="{{ v.title or project.title }}"></video>
+      {% elif v.embed %}<iframe src="{{ v.embed.embed }}" title="{{ v.title or project.title }}" loading="lazy" allow="fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+      {% else %}<div class="ph" style="height:100%;aspect-ratio:auto"><span><a href="{{ v.url }}" target="_blank" rel="noopener noreferrer" style="color:inherit">Watch video ↗</a></span></div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if gallery %}
+  <div class="wrap">
+    <div class="pgallery" data-lightbox>
+      {% for g in gallery %}
+      <figure class="fig reveal{% if g.height > g.width %} is-portrait{% endif %}" data-full="{{ media_url(g.path, g.variants[-1]) }}">{{ picture(g, sizes="(min-width:760px) 50vw, 100vw", alt=g.alt or project.title) }}</figure>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</article>
+
+{% if prev_project or next_project %}
+<nav class="dnav" aria-label="More from this department">
+  {% if prev_project %}<a href="{{ url_for('public.project', slug=prev_project.dept_slug, project_slug=prev_project.slug) }}"><span class="eyebrow">← Previous project</span><strong>{{ prev_project.title }}</strong></a>{% else %}<a href="{{ url_for('public.department', slug=dept.slug) }}"><span class="eyebrow">← Back to</span><strong>{{ dept.name }}</strong></a>{% endif %}
+  {% if next_project %}<a href="{{ url_for('public.project', slug=next_project.dept_slug, project_slug=next_project.slug) }}"><span class="eyebrow">Next project →</span><strong>{{ next_project.title }}</strong></a>{% else %}<a href="{{ url_for('public.department', slug=dept.slug) }}"><span class="eyebrow">Back to →</span><strong>{{ dept.name }}</strong></a>{% endif %}
+</nav>
+{% else %}
+<nav class="dnav" aria-label="Back"><a href="{{ url_for('public.department', slug=dept.slug) }}"><span class="eyebrow">← Back to</span><strong>{{ dept.name }}</strong></a><a href="{{ url_for('enquiry.form', department=dept.slug) }}"><span class="eyebrow">Like this? →</span><strong>Start a project</strong></a></nav>
+{% endif %}
+{% endblock %}

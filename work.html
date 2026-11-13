@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import pcard, placeholder_wall %}
+{% block page_id %}work{% endblock %}
+{% block content %}
+<section class="phero wrap">
+  <p class="eyebrow muted" style="margin-bottom:1.4rem">Selected work</p>
+  <h1>The work</h1>
+  <p class="lede">Everything published across our six departments. Each project is labelled Client project, Concept project or Personal experiment.</p>
+</section>
+<section class="section">
+  <div class="wrap">
+    {% if projects %}
+    <div class="section__head">
+      <span class="eyebrow muted">{{ projects|length }} project{{ '' if projects|length == 1 else 's' }}</span>
+      <div class="filters" role="group" aria-label="Filter by department" data-filters>
+        <button class="chip" type="button" aria-pressed="true" data-filter="">All</button>
+        {% for d in departments if projects|selectattr('department_id', 'equalto', d.id)|list %}<button class="chip" type="button" aria-pressed="false" data-filter="{{ d.name }}" data-by="dept">{{ d.name }}</button>{% endfor %}
+      </div>
+    </div>
+    <div class="pgrid" data-filterable data-filter-attr="data-dept">
+      {% for p in projects %}<div data-dept="{{ p.dept_name }}" class="pcard-wrap">{{ pcard(p, show_dept=True) }}</div>{% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-note">
+      <h2>Work awaiting publication</h2>
+      <p>The portfolio is being prepared. Projects appear here, and inside their departments, as soon as they are published. Nothing on this site is placeholder work presented as real.</p>
+      <a class="link" href="{{ url_for('public.warehouse') }}">Walk the warehouse <span class="arrow">→</span></a>
+    </div>
+    {{ placeholder_wall(3) }}
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block page_id %}about{% endblock %}
+{% block content %}
+<section class="phero wrap">
+  <p class="eyebrow muted" style="margin-bottom:1.4rem">About PBF Studio</p>
+  <h1>An independent creative studio.</h1>
+  <p class="lede">Based in Nairobi, Kenya, working with businesses in Kenya and internationally. Strategy, design, digital experiences and visual production, under one roof.</p>
+</section>
+<section class="section wrap">
+  <p class="statement reveal">At PBF Studio, we believe every business has a story worth communicating. We bring strategy, creativity and execution together to build identities, experiences and visual expressions that help businesses <mark>stand apart</mark>.</p>
+</section>
+<section class="section wrap" style="padding-top:0">
+  <div class="dsplit">
+    <div><h2 class="section__title">What we stand for</h2></div>
+    <div class="pillars">
+      {% set items = [
+        ("Creative thinking", "We start from the idea, not the template. The work should feel like it could only belong to your business."),
+        ("Strategic execution", "Good ideas need a plan. We connect creative decisions to what your business is trying to achieve."),
+        ("Attention to detail", "Spacing, type, light, finish. The small things are what make work feel considered."),
+        ("Business understanding", "We learn how your business earns, who it serves and where it’s going, before we design anything."),
+        ("Visual storytelling", "Photography, film, identity and space. We tell one story across every touchpoint."),
+        ("Collaboration", "You know your business best. We work with you, not at you."),
+        ("Adaptability", "A new venture and an established organisation need different things. We scale the approach to fit.")] %}
+      {% for t, body in items %}
+      <div class="pillar reveal"><span class="num">{{ '%02d'|format(loop.index) }}</span><h3>{{ t }}</h3><p>{{ body }}</p></div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+<section class="section wrap" style="padding-top:0">
+  <div class="dsplit">
+    <div><h2 class="section__title">A creative partner</h2></div>
+    <div class="prose">
+      <p>PBF Studio works with small businesses finding their voice and with established organisations refreshing how they show up. The scale changes. The standard doesn’t.</p>
+      <p>The warehouse you walked through is our digital environment: a way of showing how the six departments fit together. It is a concept for this website, not a physical headquarters.</p>
+      <p><a class="link" href="{{ url_for('public.warehouse') }}">Walk the warehouse <span class="arrow">→</span></a></p>
+    </div>
+  </div>
+</section>
+<section class="band on-dark">
+  <div class="wrap cta-band">
+    <h2>Let’s make something worth remembering.</h2>
+    <a class="btn btn--red" href="{{ url_for('enquiry.form') }}">Start a project <span class="arrow">→</span></a>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" class="no-js" data-page="{% block page_id %}page{% endblock %}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>{{ seo.title }}</title>
+<meta name="description" content="{{ seo.description }}">
+{% if seo.noindex %}<meta name="robots" content="noindex,nofollow">{% else %}<meta name="robots" content="index,follow,max-image-preview:large">{% endif %}
+<link rel="canonical" href="{{ abs_url(request.path) }}">
+<meta name="theme-color" content="#161616">
+<meta property="og:site_name" content="PBF Studio">
+<meta property="og:type" content="{{ seo.og_type or 'website' }}">
+<meta property="og:title" content="{{ seo.title }}">
+<meta property="og:description" content="{{ seo.description }}">
+<meta property="og:url" content="{{ abs_url(request.path) }}">
+<meta property="og:image" content="{{ seo.image or abs_url(url_for('static', filename='img/og-default.jpg')) }}">
+<meta property="og:locale" content="en_KE">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+<script src="{{ static_v('js/boot.js') }}"></script>
+<link rel="preload" href="{{ url_for('static', filename='fonts/pbf-display-black.woff') }}" as="font" type="font/woff" crossorigin>
+<link rel="preload" href="{{ url_for('static', filename='fonts/pbf-sans-regular.woff') }}" as="font" type="font/woff" crossorigin>
+<link rel="stylesheet" href="{{ static_v('css/site.css') }}">
+<link rel="stylesheet" href="{{ static_v('css/scenes.css') }}">
+{% block head %}{% endblock %}
+{% for block in seo.jsonld %}<script type="application/ld+json">{{ block|tojson_compact }}</script>
+{% endfor %}
+{% if not seo.noindex %}<script type="application/ld+json">{{ {
+  "@context": "https://schema.org", "@type": "ProfessionalService", "name": "PBF Studio",
+  "description": "Independent creative studio in Nairobi, Kenya: branding, digital experiences, photography, spaces, creative direction and fashion.",
+  "url": abs_url("/"),
+  "address": {"@type": "PostalAddress", "addressLocality": "Nairobi", "addressCountry": "KE"},
+  "areaServed": ["Kenya", "Worldwide"],
+  "sameAs": [site.instagram_url, site.tiktok_url]|select|list
+}|tojson_compact }}</script>{% endif %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+<a class="skip" href="#main">Skip to content</a>
+<div class="curtain" aria-hidden="true"></div>
+<div class="cursor" aria-hidden="true"></div>
+{% include "partials/header.html" %}
+<main id="main" tabindex="-1">
+{% block content %}{% endblock %}
+</main>
+{% block footer %}{% include "partials/footer.html" %}{% endblock %}
+{% if not hide_mbar %}
+<nav class="mbar" aria-label="Quick actions">
+  <a class="is-red" href="{{ url_for('enquiry.form') }}">Start a project</a>
+  {% if whatsapp_url %}<a href="{{ whatsapp_url }}" target="_blank" rel="noopener">WhatsApp</a>{% else %}<a href="{{ url_for('public.contact') }}">Contact</a>{% endif %}
+</nav>
+{% endif %}
+<script src="{{ static_v('js/site.js') }}" defer></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

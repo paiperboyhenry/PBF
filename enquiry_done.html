@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block page_id %}enquiry-done{% endblock %}
+{% block content %}
+<div class="wrap done">
+  <p class="eyebrow muted" style="margin-bottom:1.2rem">Enquiry received</p>
+  <h1>Thank you. We’ve got it.</h1>
+  <p class="prose" style="margin-top:1.4rem">Your enquiry has been saved. We’ll read it properly and reply personally.</p>
+  <span class="ref">{{ info.ref }}</span>
+  {% if info.email_confirmation %}<p class="muted">A confirmation is on its way to your email.</p>{% endif %}
+  <div class="actions">
+    {% if info.whatsapp_url %}<a class="btn btn--red" href="{{ info.whatsapp_url }}" target="_blank" rel="noopener">Follow up on WhatsApp</a>{% endif %}
+    <a class="btn btn--ghost" href="{{ url_for('public.warehouse') }}">Explore the warehouse</a>
+    <a class="btn btn--ghost" href="{{ url_for('public.home') }}" data-reception>Back to reception</a>
+  </div>
+</div>
+{% endblock %}

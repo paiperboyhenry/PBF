@@ -1,0 +1,46 @@
+{% extends "admin/base.html" %}
+{% from "partials/admin_macros.html" import csrf %}
+{% from "partials/macros.html" import picture %}
+{% block title %}{{ dept.name }}{% endblock %}
+{% block content %}
+<header class="adm__head"><div><a class="muted" href="{{ url_for('admin.departments') }}">← Departments</a><h1>{{ '%02d'|format(dept.number) }} · {{ dept.name }}</h1></div>
+  <div class="actions"><a class="btn btn--small btn--ghost" href="{{ url_for('public.department', slug=dept.slug) }}" target="_blank" rel="noopener" data-no-transition>View</a><a class="btn btn--small btn--red" href="{{ url_for('admin.project_new', department=dept.id) }}">New project here</a></div></header>
+<form method="post" enctype="multipart/form-data" class="card form">
+  {{ csrf() }}
+  <div class="field"><label for="tagline">Short line <span class="opt">shown on the reception picker</span></label><input class="input" id="tagline" name="tagline" value="{{ dept.tagline }}" maxlength="120"></div>
+  <div class="field"><label for="description">Description</label><textarea class="textarea" id="description" name="description" maxlength="800" required style="min-height:7rem">{{ dept.description }}</textarea></div>
+  <div class="grid2">
+    <div class="field"><label for="services">Services <span class="opt">one per line</span></label><textarea class="textarea" id="services" name="services" style="min-height:12rem">{{ dept.services|join('\n') }}</textarea></div>
+    <div class="field"><label for="categories">Portfolio categories <span class="opt">one per line</span></label><textarea class="textarea" id="categories" name="categories" style="min-height:12rem">{{ dept.categories|join('\n') }}</textarea>
+      <p class="muted" style="font-size:.8rem;margin-top:.5rem">Projects pick one of these. Renaming a category won’t change projects already using the old name.</p></div>
+  </div>
+  <label class="option" style="max-width:24rem;margin-bottom:1.6rem"><input type="checkbox" name="is_visible" value="1" {% if dept.is_visible %}checked{% endif %}><span>Visible on the public site</span></label>
+  <h2 class="adm__h2">Images</h2>
+  <div class="grid2">
+    <div class="field"><label for="cover">Cover image {% if dept.cover %}<span class="opt">replaces the current one</span>{% endif %}</label><input class="input" id="cover" name="cover" type="file" accept="image/jpeg,image/png,image/webp"></div>
+    <div class="field"><label for="cover_alt">Cover description</label><input class="input" id="cover_alt" name="cover_alt" maxlength="200" value="{{ dept.cover.alt if dept.cover else '' }}"></div>
+  </div>
+  <div class="field"><label for="gallery">Department gallery images <span class="opt">optional · shown below the portfolio</span></label><input class="input" id="gallery" name="gallery" type="file" accept="image/jpeg,image/png,image/webp" multiple></div>
+  <div class="formbar"><button class="btn btn--red" type="submit">Save department</button></div>
+</form>
+
+<section class="card" id="media">
+  <h2 class="adm__h2">Current images</h2>
+  <h3 class="eyebrow muted">Cover</h3>
+  {% if dept.cover %}<div class="mcard mcard--cover"><div class="mimg">{{ picture(dept.cover, sizes="320px") }}</div>
+    {% set cid = None %}</div>
+    <p class="muted" style="font-size:.85rem">Upload a new cover above to replace it, or promote a gallery image below.</p>{% else %}<p class="muted">No cover image yet.</p>{% endif %}
+  <h3 class="eyebrow muted" style="margin-top:2rem">Gallery ({{ gallery|length }})</h3>
+  {% if gallery %}<div class="mgrid">{% for g in gallery %}
+    <div class="mcard"><div class="mimg">{{ picture(g, sizes="220px") }}</div>
+      <form method="post" action="{{ url_for('admin.department_image_action', did=dept.id, iid=g.id, action='alt') }}" class="mrow">{{ csrf() }}<input class="input" name="alt" value="{{ g.alt }}" placeholder="Description" maxlength="200" aria-label="Image description"><button class="btn btn--small btn--ghost">Save</button></form>
+      <div class="mrow">{% for act, lab in (('up','←'),('down','→'),('cover','Make cover'),('delete','Delete')) %}<form method="post" action="{{ url_for('admin.department_image_action', did=dept.id, iid=g.id, action=act) }}" class="inline">{{ csrf() }}<button class="btn btn--small btn--ghost">{{ lab }}</button></form>{% endfor %}</div></div>{% endfor %}</div>
+  {% else %}<p class="muted">No gallery images.</p>{% endif %}
+</section>
+
+<section class="card">
+  <h2 class="adm__h2">Projects in this department</h2>
+  {% if projects %}<ul class="list">{% for p in projects %}<li><a href="{{ url_for('admin.project_edit', pid=p.id) }}"><strong>{{ p.title }}</strong></a><span class="pill pill--{{ p.status }}">{{ p.status|capitalize }}</span></li>{% endfor %}</ul>
+  <p style="margin:1rem 0 0"><a href="{{ url_for('admin.projects', department=dept.id) }}">Reorder projects →</a></p>{% else %}<p class="muted">No projects yet.</p>{% endif %}
+</section>
+{% endblock %}

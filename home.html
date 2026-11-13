@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% set header_dark = true %}
+{% block page_id %}home{% endblock %}
+{% block body_class %}no-mbar-home{% endblock %}
+{% block content %}
+{# ---------- cinematic entrance (shown only when boot.js decides; hidden entirely without JS) ---------- #}
+<div class="intro" id="intro" aria-label="Introduction">
+  <div class="intro__brand" aria-hidden="true">
+    <b>PBF Studio</b>
+    <i>Independent creative studio · Nairobi</i>
+    <div class="intro__load" id="intro-load"></div>
+  </div>
+  <div class="ext" aria-hidden="true">
+    <div class="ext__cam">
+      <div class="ext__ground"></div>
+      <div class="ext__spill"></div>
+      <div class="facade">
+        <div class="facade__beam"></div>
+        <div class="facade__col facade__col--l"></div><div class="facade__col facade__col--r"></div>
+        <div class="facade__sign">PBF STUDIO</div>
+        <div class="portal"><div class="portal__leaf portal__leaf--l"></div><div class="portal__leaf portal__leaf--r"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="intro__split" aria-hidden="true"></div>
+  <button class="intro__skip" id="intro-skip" type="button">Skip introduction</button>
+</div>
+
+<section class="reception" id="reception" aria-labelledby="welcome-title">
+  <div class="stage" id="stage" aria-hidden="true">
+    <div class="room">
+      <div class="pl pl--ceil">
+        {% for x in (20, 44, 64, 84, 108) %}<i class="track" style="--x:{{ x }}"></i>{% endfor %}
+      </div>
+      <div class="pl pl--floor"><div class="floor-pool"></div></div>
+      <div class="pl pl--left"></div>
+      <div class="pl pl--right"></div>
+      <div class="pl pl--back">
+        <div class="wall-lightline"></div>
+        <div class="wall-door wall-door--l"></div>
+        <div class="wall-rail"></div>
+        <div class="wall-door wall-door--slide"></div>
+        <div class="sconce"></div>
+        <div class="niche"></div>
+        <div class="wall-sign"><b>PBF STUDIO</b><i>Independent Creative Studio</i></div>
+      </div>
+      <span class="beam" style="--z:42"></span>
+      <span class="beam" style="--z:74"></span>
+      <span class="girder" style="--x:-30"></span>
+      <span class="girder" style="--x:30"></span>
+    </div>
+  </div>
+
+  <p class="rc-meta"><button type="button" id="replay">Replay introduction</button></p>
+
+  <div class="rc-ui">
+    <div class="counter on-dark">
+      <div class="counter__in">
+        <div class="welcome">
+          <span class="eyebrow">Reception</span>
+          <h1 id="welcome-title">Welcome to PBF Studio.</h1>
+          <p>“What would you like to explore today?”</p>
+        </div>
+        <div class="opts">
+          <a class="opt" href="{{ url_for('public.warehouse') }}" id="opt-warehouse">
+            <span class="opt__n">01</span>
+            <span class="opt__t">Explore the creative warehouse</span>
+            <p class="opt__d">Walk through our creative departments and discover what we do.</p>
+            <span class="opt__a">Enter warehouse <span class="arrow">→</span></span>
+          </a>
+          <a class="opt" href="{{ url_for('public.warehouse') }}#departments" id="opt-picker" aria-haspopup="dialog">
+            <span class="opt__n">02</span>
+            <span class="opt__t">Visit a specific department</span>
+            <p class="opt__d">Know what you’re looking for? Head directly to the department you’re interested in.</p>
+            <span class="opt__a">Select department <span class="arrow">→</span></span>
+          </a>
+          <a class="opt" href="{{ url_for('enquiry.form') }}" id="opt-project">
+            <span class="opt__n">03</span>
+            <span class="opt__t">Work with PBF</span>
+            <p class="opt__d">Have a project in mind? Let’s discuss what we can create together.</p>
+            <span class="opt__a">Start a project <span class="arrow">→</span></span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="picker on-dark" id="picker" role="dialog" aria-modal="true" aria-labelledby="picker-title" hidden>
+  <div class="picker__head">
+    <div><h2 id="picker-title">Select a department</h2><p>Six departments, one studio. Go straight to the one you need.</p></div>
+    <button class="picker__close" type="button" id="picker-close">Close</button>
+  </div>
+  <ol>
+    {% for d in departments %}
+    <li><a href="{{ url_for('public.department', slug=d.slug) }}">
+      <span class="n">{{ '%02d'|format(d.number) }}</span>
+      <span><strong>{{ d.name }}</strong><small>{{ d.tagline }}</small></span>
+      <span class="arrow" aria-hidden="true">→</span>
+    </a></li>
+    {% endfor %}
+  </ol>
+</div>
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow muted" style="margin-bottom:1.4rem">The studio</p>
+    <p class="statement reveal">At PBF Studio, we believe every business has a story worth communicating. We bring strategy, creativity and execution together to build identities, experiences and visual expressions that help businesses <mark>stand apart</mark>.</p>
+    <div style="margin-top:2.4rem"><a class="link" href="{{ url_for('public.about') }}">About PBF Studio <span class="arrow">→</span></a></div>
+  </div>
+</section>
+
+{% if featured %}
+<section class="section section--tight" style="padding-top:0">
+  <div class="wrap">
+    <div class="section__head"><h2 class="section__title">Selected work</h2><a class="link" href="{{ url_for('public.work') }}">All work <span class="arrow">→</span></a></div>
+    {% from "partials/macros.html" import pcard %}
+    <div class="pgrid">{% for p in featured[:3] %}{{ pcard(p, show_dept=True) }}{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+
+<section class="band on-dark">
+  <div class="wrap section">
+    <div class="section__head"><h2 class="section__title">Six departments</h2><a class="link" href="{{ url_for('public.warehouse') }}">Enter the warehouse <span class="arrow">→</span></a></div>
+    <div class="warehouse-strip">
+      {% for d in departments %}
+      <a href="{{ url_for('public.department', slug=d.slug) }}"><span class="num">{{ '%02d'|format(d.number) }}</span><strong>{{ d.name }}</strong></a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ static_v('js/reception.js') }}" defer></script>{% endblock %}

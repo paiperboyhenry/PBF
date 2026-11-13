@@ -1,0 +1,18 @@
+{% extends "admin/base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block content %}
+<div class="login">
+  <div class="login__card">
+    <p class="adm__brand"><span>PBF Studio</span><i></i></p>
+    <h1>Admin sign in</h1>
+    {% if error %}<div class="flash flash--error" role="alert">{{ error }}</div>{% endif %}
+    <form method="post" autocomplete="on">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="field"><label for="e">Email</label><input class="input" id="e" name="email" type="email" autocomplete="username" required autofocus></div>
+      <div class="field"><label for="p">Password</label><input class="input" id="p" name="password" type="password" autocomplete="current-password" required></div>
+      <button class="btn btn--red" type="submit" style="width:100%">Sign in</button>
+    </form>
+    {% if setup_open %}<p class="muted" style="margin-top:1.6rem;font-size:.85rem">No admin account exists yet. <a href="{{ url_for('admin.setup') }}">Create the first admin</a>.</p>{% endif %}
+  </div>
+</div>
+{% endblock %}

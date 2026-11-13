@@ -1,0 +1,35 @@
+{% extends "admin/base.html" %}
+{% block title %}Overview{% endblock %}
+{% block content %}
+<header class="adm__head"><h1>Overview</h1><a class="btn btn--small btn--red" href="{{ url_for('admin.project_new') }}">New project</a></header>
+<section class="stats">
+  <a class="stat" href="{{ url_for('admin.projects', status='published') }}"><span class="stat__n">{{ published }}</span><span class="stat__l">Published projects</span></a>
+  <a class="stat" href="{{ url_for('admin.projects', status='draft') }}"><span class="stat__n">{{ drafts }}</span><span class="stat__l">Drafts</span></a>
+  <a class="stat" href="{{ url_for('admin.enquiries', status='new') }}"><span class="stat__n">{{ status_counts.get('new', 0) }}</span><span class="stat__l">New enquiries</span></a>
+  <a class="stat" href="{{ url_for('admin.enquiries') }}"><span class="stat__n">{{ enquiry_total }}</span><span class="stat__l">Total enquiries</span></a>
+</section>
+<div class="cols">
+  <section class="card">
+    <h2 class="adm__h2">Projects by department</h2>
+    <table class="tbl"><thead><tr><th>Department</th><th class="r">Published</th><th class="r">Drafts</th><th></th></tr></thead><tbody>
+      {% for c in counts %}<tr><td><span class="num muted">{{ '%02d'|format(c.number) }}</span> {{ c.name }}</td><td class="r">{{ c.published }}</td><td class="r">{{ c.drafts }}</td><td class="r"><a href="{{ url_for('admin.projects', department=c.id) }}">Manage</a></td></tr>{% endfor %}
+    </tbody></table>
+  </section>
+  <section class="card">
+    <h2 class="adm__h2">Recent enquiries</h2>
+    {% if recent %}<ul class="list">{% for e in recent %}
+      <li><a href="{{ url_for('admin.enquiry_detail', eid=e.id) }}"><strong>{{ e.full_name }}</strong>{% if e.business_name %} · {{ e.business_name }}{% endif %}<br><span class="muted">{{ e.ref }} · {{ e.created_at|local_dt }}</span></a><span class="pill pill--{{ e.status }}">{{ status_labels[e.status] }}</span></li>{% endfor %}</ul>
+    <p style="margin:1rem 0 0"><a href="{{ url_for('admin.enquiries') }}">All enquiries →</a></p>
+    {% else %}<p class="muted">No enquiries yet. They’ll appear here as soon as someone submits the project form.</p>{% endif %}
+  </section>
+  <section class="card">
+    <h2 class="adm__h2">Recent activity</h2>
+    {% if activity %}<ul class="list list--plain">{% for a in activity %}<li><span><strong>{{ a.action }}</strong>{% if a.detail %} · {{ a.detail }}{% endif %}<br><span class="muted">{{ a.actor }} · {{ a.created_at|local_dt }}</span></span></li>{% endfor %}</ul>{% else %}<p class="muted">Nothing yet.</p>{% endif %}
+  </section>
+  <section class="card">
+    <h2 class="adm__h2">Setup checklist</h2>
+    <ul class="list list--plain">{% for label, ok, help in checks %}<li><span><span class="dot dot--{{ 'ok' if ok else 'todo' }}"></span><strong>{{ label }}</strong>{% if not ok %}<br><span class="muted">{{ help }}</span>{% endif %}</span></li>{% endfor %}</ul>
+    <p style="margin:1rem 0 0"><a href="{{ url_for('admin.site_settings') }}">Open settings →</a></p>
+  </section>
+</div>
+{% endblock %}

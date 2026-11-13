@@ -1,0 +1,97 @@
+/* Admin: functional, calm, same three colours. */
+body.adm{display:grid;grid-template-columns:15rem minmax(0,1fr);min-height:100svh;background:var(--pearl);font-size:.95rem}
+.adm__side{position:sticky;top:0;height:100svh;background:var(--black);color:var(--pearl);display:flex;flex-direction:column;padding:1.4rem 1rem;border-right:4px solid var(--crimson)}
+.adm__logo{display:flex;align-items:center;gap:.5rem;text-decoration:none;font:900 1.1rem/1 var(--f-display);letter-spacing:.04em;margin-bottom:2rem;padding:0 .5rem}
+.adm__logo i,.adm__brand i{display:inline-block;width:.3em;height:1.1em;background:var(--crimson)}
+.adm__logo small{font:600 .6rem/1 var(--f-sans);letter-spacing:.24em;text-transform:uppercase;opacity:.6;margin-left:.3rem}
+.adm__side nav{display:grid;gap:.15rem}
+.adm__side nav a{display:flex;justify-content:space-between;align-items:center;padding:.7rem .8rem;text-decoration:none;font:600 .72rem/1 var(--f-sans);letter-spacing:.14em;text-transform:uppercase;opacity:.75}
+.adm__side nav a:hover{opacity:1;background:color-mix(in srgb,var(--pearl) 8%,transparent)}
+.adm__side nav a[aria-current="page"]{opacity:1;background:var(--crimson)}
+.adm__badge{background:var(--pearl);color:var(--black);font:700 .65rem/1 var(--f-sans);padding:.25rem .45rem;letter-spacing:0}
+.adm__foot{margin-top:auto;display:grid;gap:.6rem;padding:0 .5rem;font-size:.78rem}
+.adm__foot a,.adm__foot button{background:none;border:0;padding:0;color:inherit;opacity:.75;text-align:left;cursor:pointer;font:inherit;text-decoration:underline;text-underline-offset:3px}
+.adm__foot span{opacity:.45;overflow-wrap:anywhere}
+.adm__main{padding:clamp(1.2rem,3vw,2.4rem);min-width:0;max-width:78rem;width:100%}
+.adm__main--bare{max-width:none;grid-column:1/-1;display:grid;place-items:center}
+.adm__head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:1.6rem}
+.adm__head h1{font:900 clamp(1.5rem,3vw,2.2rem)/1.05 var(--f-display);text-transform:uppercase;letter-spacing:-.03em}
+.adm__h2{font:600 .7rem/1 var(--f-sans);letter-spacing:.2em;text-transform:uppercase;margin:0 0 1.2rem;padding-bottom:.8rem;border-bottom:1px solid var(--hair)}
+.form .adm__h2{margin-top:2.2rem}
+.actions{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+.inline{display:inline}
+.nowrap{white-space:nowrap}
+.card{background:color-mix(in srgb,var(--pearl) 60%,#fff);border:1px solid var(--hair);padding:clamp(1.1rem,2.4vw,1.8rem);margin-bottom:1.4rem}
+.card--flush{padding:0;overflow-x:auto}
+.cols{display:grid;gap:1.4rem}
+@media(min-width:1100px){.cols{grid-template-columns:1fr 1fr}.cols--wide{grid-template-columns:1.3fr 1fr}}
+.stats{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));margin-bottom:1.4rem}
+.stat{display:flex;flex-direction:column;gap:.6rem;padding:1.3rem;background:var(--black);color:var(--pearl);text-decoration:none;border-left:4px solid var(--crimson);transition:background-color .3s}
+.stat:hover{background:var(--graphite)}
+.stat__n{font:900 2.6rem/1 var(--f-display);letter-spacing:-.04em}
+.stat__l{font:600 .66rem/1 var(--f-sans);letter-spacing:.18em;text-transform:uppercase;opacity:.7}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{text-align:left;font:600 .62rem/1 var(--f-sans);letter-spacing:.18em;text-transform:uppercase;color:var(--muted);padding:.9rem 1rem;border-bottom:1px solid var(--ink);white-space:nowrap}
+.tbl td{padding:.85rem 1rem;border-bottom:1px solid var(--hair);vertical-align:middle}
+.tbl .r{text-align:right}
+.tbl--rows tbody tr:hover{background:color-mix(in srgb,var(--black) 3%,transparent)}
+.card .tbl th:first-child,.card .tbl td:first-child{padding-left:0}
+.card--flush .tbl th:first-child,.card--flush .tbl td:first-child{padding-left:1rem}
+.list{display:grid}
+.list li{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.8rem 0;border-bottom:1px solid var(--hair)}
+.list li a{text-decoration:none}
+.list--plain li{align-items:flex-start}
+.pill{display:inline-block;padding:.35em .7em;border:1px solid currentColor;font:600 .6rem/1 var(--f-sans);letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;background:none}
+.pill--published,.pill--won{background:var(--black);color:var(--pearl);border-color:var(--black)}
+.pill--draft,.pill--closed{color:var(--muted)}
+.pill--new{background:var(--crimson);color:var(--pearl);border-color:var(--crimson)}
+.pill--contacted,.pill--in_discussion{color:var(--crimson)}
+.dot{display:inline-block;width:.6rem;height:.6rem;border-radius:50%;margin-right:.6rem;border:1px solid var(--black)}
+.dot--ok{background:var(--black)}
+.dot--todo{background:var(--crimson);border-color:var(--crimson)}
+.icon{width:2rem;height:2rem;border:1px solid var(--hair);background:transparent;cursor:pointer;font-size:1rem}
+.icon:hover{border-color:var(--ink)}
+.filterbar{display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:1.2rem;align-items:center}
+.filterbar .select,.filterbar .input{width:auto;min-width:14rem;border:1px solid var(--ink);padding:.6rem .8rem;background:#fff}
+.tabs{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem}
+.tabs a{padding:.6rem .9rem;border:1px solid var(--hair);text-decoration:none;font:600 .66rem/1 var(--f-sans);letter-spacing:.14em;text-transform:uppercase}
+.tabs a b{opacity:.55;margin-left:.3rem}
+.tabs a[aria-current="true"]{background:var(--black);color:var(--pearl);border-color:var(--black)}
+.flashes{display:grid;gap:.5rem;margin-bottom:1.2rem}
+.flash{padding:.9rem 1.1rem;border:1px solid var(--black);background:#fff;font-weight:500}
+.flash--ok{border-left:5px solid var(--black)}
+.flash--error{border:1px solid var(--crimson);border-left:5px solid var(--crimson);color:var(--crimson);background:color-mix(in srgb,var(--crimson) 6%,#fff)}
+.form .input,.form .select,.form .textarea,.card .input,.card .select,.card .textarea{background:#fff}
+.form .input,.form .select,.card .input,.card .select{border:1px solid var(--ink);padding:.7rem .8rem;font-size:.95rem}
+.form .field,.card .field{margin-bottom:1.3rem}
+.form .option span{background:#fff}
+.form .option input:checked+span{background:var(--black)}
+.formbar{display:flex;flex-wrap:wrap;align-items:center;gap:1rem;margin-top:1.8rem;padding-top:1.4rem;border-top:1px solid var(--hair)}
+.stack{display:grid;gap:.8rem}
+.statusgrid{display:grid;gap:.4rem}
+.statusgrid .option span{min-height:2.8rem}
+.mgrid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fill,minmax(14rem,1fr))}
+.mcard{border:1px solid var(--hair);background:#fff;padding:.7rem;display:grid;gap:.6rem;align-content:start}
+.mcard--cover{max-width:22rem}
+.mimg{aspect-ratio:4/3;background:var(--concrete);overflow:hidden}
+.mimg img{width:100%;height:100%;object-fit:cover}
+.mrow{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center}
+.mrow .input{flex:1;min-width:6rem;padding:.45rem .6rem;font-size:.85rem}
+.notes{display:grid;gap:.8rem;margin-top:1.2rem}
+.notes li{padding:.9rem;background:#fff;border:1px solid var(--hair);display:grid;gap:.4rem}
+.notes p{margin:0 0 .4rem}
+.linkbtn{background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:.82rem}
+.clist>div{grid-template-columns:7rem 1fr;padding:.8rem 0}
+.login{width:100%;min-height:100svh;display:grid;place-items:center;padding:1.2rem}
+.login__card{width:100%;max-width:26rem;background:var(--pearl);border-top:5px solid var(--crimson);padding:2.2rem;box-shadow:0 0 0 1px var(--hair)}
+body.adm .login{background:var(--black)}
+.login__card h1{font:900 1.7rem/1 var(--f-display);text-transform:uppercase;letter-spacing:-.03em;margin:.4rem 0 1.4rem}
+.adm__brand{display:flex;gap:.4rem;align-items:center;font:900 .9rem/1 var(--f-display);letter-spacing:.06em;text-transform:uppercase;margin:0}
+@media(max-width:900px){
+  body.adm{grid-template-columns:1fr}
+  .adm__side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;gap:.8rem;padding:.8rem 1rem;border-right:0;border-bottom:4px solid var(--crimson)}
+  .adm__logo{margin:0}
+  .adm__side nav{display:flex;flex-wrap:wrap;width:100%;order:3}
+  .adm__foot{margin:0 0 0 auto;grid-auto-flow:column;align-items:center}
+  .adm__foot span{display:none}
+}

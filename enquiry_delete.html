@@ -1,0 +1,10 @@
+{% extends "admin/base.html" %}
+{% from "partials/admin_macros.html" import csrf %}
+{% block title %}Delete enquiry{% endblock %}
+{% block content %}
+<header class="adm__head"><h1>Delete enquiry</h1></header>
+<form method="post" class="card" style="max-width:36rem">{{ csrf() }}
+  <p>Permanently delete enquiry <strong>{{ e.ref }}</strong> from {{ e.full_name }}, including its notes and attachments? This can’t be undone. Consider setting its status to <em>Closed</em> instead.</p>
+  <div class="actions"><button class="btn btn--red" type="submit">Delete permanently</button><a class="btn btn--ghost" href="{{ url_for('admin.enquiry_detail', eid=e.id) }}">Cancel</a></div>
+</form>
+{% endblock %}

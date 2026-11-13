@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% set header_dark = true %}
+{% set hide_mbar = false %}
+{% block page_id %}warehouse{% endblock %}
+{% block content %}
+{% set kinds = {1:'pivot', 2:'screen', 3:'aperture', 4:'arch', 5:'slider', 6:'atelier'} %}
+<section class="hall" id="hall" aria-labelledby="hall-title">
+  <h1 class="sr-only" id="hall-title">The PBF Studio creative warehouse — six departments</h1>
+  <p class="hall__hint" id="hall-hint">Scroll or drag sideways · select a door to enter</p>
+  <div class="hall__scroll" id="hall-scroll" tabindex="-1">
+    <div class="hall__track" id="departments">
+      <div class="hall__ceil" aria-hidden="true"></div>
+      <div class="hall__wall" aria-hidden="true"></div>
+      <div class="hall__floor" aria-hidden="true"></div>
+      {% for d in departments %}
+      {% set kind = kinds.get(d.number, 'pivot') %}
+      <article class="bay{% if d.theme == 'atelier' %} bay--atelier{% endif %}" data-index="{{ loop.index0 }}" aria-labelledby="bay-{{ d.number }}">
+        <span class="bay__no" aria-hidden="true">{{ '%02d'|format(d.number) }}</span>
+        <span class="bay__light" aria-hidden="true"></span>
+        <div class="bay__sign"><span class="n">DEPARTMENT {{ '%02d'|format(d.number) }}</span><b id="bay-{{ d.number }}">{{ d.name }}</b></div>
+        <a class="door door--{{ kind }}" href="{{ url_for('public.department', slug=d.slug) }}" aria-label="Enter department {{ d.number }}: {{ d.name }}">
+          <span class="door__cue" aria-hidden="true">Enter</span>
+          <span class="door__frame"><span class="door__in"></span><span class="door__leaf"></span></span>
+          {% if kind == 'atelier' %}<span class="door__sconce" aria-hidden="true"></span>{% endif %}
+        </a>
+        <div class="bay__info">
+          <p>{{ d.description }}</p>
+          <a class="bay__enter" href="{{ url_for('public.department', slug=d.slug) }}" tabindex="-1" aria-hidden="true">Enter <span class="arrow">→</span></a>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="hall__rail" id="hall-rail" aria-label="Departments">
+    <button class="arr" type="button" data-dir="-1" aria-label="Previous department">←</button>
+    <ol>
+      {% for d in departments %}<li><button type="button" data-goto="{{ loop.index0 }}"><span class="n">{{ '%02d'|format(d.number) }}</span><span>{{ d.name }}</span></button></li>{% endfor %}
+    </ol>
+    <button class="arr" type="button" data-dir="1" aria-label="Next department" style="border-right:0;border-left:1px solid var(--hair-light)">→</button>
+  </div>
+  <div class="hall__fade" aria-hidden="true"></div>
+</section>
+{% endblock %}
+{% block footer %}{% include "partials/footer.html" %}{% endblock %}
+{% block scripts %}<script src="{{ static_v('js/warehouse.js') }}" defer></script>{% endblock %}

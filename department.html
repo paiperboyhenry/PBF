@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% from "partials/macros.html" import picture, pcard, placeholder_wall %}
+{% set header_dark = true %}
+{% block page_id %}department{% endblock %}
+{% block body_class %}theme-{{ dept.theme }}{% endblock %}
+{% block content %}
+{% if not dept.is_visible %}<div class="preview-bar"><span>Hidden department — only you can see this page while signed in to admin</span><a href="{{ url_for('admin.department_edit', did=dept.id) }}">Edit</a></div>{% endif %}
+<section class="dhero on-dark">
+  <div class="dhero__beam"></div>
+  {% if dept.cover %}<div class="dhero__bg" aria-hidden="true">{{ picture(dept.cover, sizes="100vw", alt="", loading="eager", priority=True) }}</div>{% endif %}
+  <div class="dhero__shade"></div>
+  <div class="wrap dhero__in">
+    <div>
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="{{ url_for('public.home') }}" data-reception>Reception</a><span>/</span><a href="{{ url_for('public.warehouse') }}">Warehouse</a><span>/</span><span>Department {{ '%02d'|format(dept.number) }}</span></nav>
+      <div class="dhero__num" aria-hidden="true">{{ '%02d'|format(dept.number) }}</div>
+      <h1>{{ dept.name }}</h1>
+    </div>
+    <div class="dhero__side">
+      <p>{{ dept.description }}</p>
+      <div style="display:flex;flex-wrap:wrap;gap:.8rem;margin-top:1.8rem">
+        <a class="btn btn--red" href="{{ url_for('enquiry.form', department=dept.slug) }}">Start a project <span class="arrow">→</span></a>
+        <a class="btn btn--ghost-light" href="#portfolio">View portfolio</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="atelier-body">
+<section class="section" id="portfolio" aria-labelledby="portfolio-title">
+  <div class="wrap">
+    {% set cats = [] %}
+    {% for p in projects if p.category and p.category not in cats %}{% set _ = cats.append(p.category) %}{% endfor %}
+    <div class="section__head">
+      <h2 class="section__title" id="portfolio-title">Portfolio</h2>
+      {% if cats|length > 1 %}
+      <div class="filters" role="group" aria-label="Filter by category" data-filters>
+        <button class="chip" type="button" aria-pressed="true" data-filter="">All</button>
+        {% for c in cats %}<button class="chip" type="button" aria-pressed="false" data-filter="{{ c }}">{{ c }}</button>{% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    {% if projects %}
+      <div class="pgrid" data-filterable>
+        {% for p in projects %}{{ pcard(p) }}{% endfor %}
+      </div>
+      <p class="muted" style="margin-top:2.4rem;font-size:.85rem">Projects are labelled <strong>Client project</strong>, <strong>Concept project</strong> or <strong>Personal experiment</strong> so you always know what you’re looking at.</p>
+    {% else %}
+      <div class="empty-note">
+        <h2>Work awaiting publication</h2>
+        <p>This department’s portfolio is being prepared. Published projects will appear here automatically. In the meantime, tell us what you have in mind.</p>
+        <a class="link" href="{{ url_for('enquiry.form', department=dept.slug) }}">Start a project <span class="arrow">→</span></a>
+      </div>
+      {{ placeholder_wall(3) }}
+    {% endif %}
+  </div>
+</section>
+
+{% if gallery %}
+<section class="section section--tight" style="padding-top:0">
+  <div class="wrap">
+    <div class="pgallery" data-lightbox>
+      {% for g in gallery %}<figure class="fig reveal" data-full="{{ media_url(g.path, g.variants[-1]) }}">{{ picture(g, sizes="(min-width:760px) 50vw, 100vw", alt=dept.name) }}</figure>{% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="section" style="padding-top:0">
+  <div class="wrap dsplit">
+    <div>
+      <h2 class="section__title">What we do here</h2>
+      <p class="muted" style="margin-top:1rem;max-width:22rem">Services within {{ dept.name }}. Each project is scoped to what the work actually needs.</p>
+    </div>
+    <div>
+      <ul class="svc-list">{% for s in dept.services %}<li>{{ s }}</li>{% endfor %}</ul>
+      {% if dept.categories %}
+      <h3 class="eyebrow muted" style="margin:2.6rem 0 1rem">Portfolio categories</h3>
+      <ul class="cats">{% for c in dept.categories %}<li>{{ c }}</li>{% endfor %}</ul>
+      {% endif %}
+    </div>
+  </div>
+</section>
+</div>
+
+<section class="band on-dark">
+  <div class="wrap cta-band">
+    <h2>Have a {{ dept.name|lower }} project in mind?</h2>
+    <a class="btn btn--red" href="{{ url_for('enquiry.form', department=dept.slug) }}">Start a project <span class="arrow">→</span></a>
+  </div>
+</section>
+
+<nav class="dnav" aria-label="Other departments">
+  {% if prev_dept %}<a href="{{ url_for('public.department', slug=prev_dept.slug) }}"><span class="eyebrow">← Previous department</span><strong>{{ prev_dept.name }}</strong></a>{% else %}<a href="{{ url_for('public.warehouse') }}"><span class="eyebrow">← Back to</span><strong>The warehouse</strong></a>{% endif %}
+  {% if next_dept %}<a href="{{ url_for('public.department', slug=next_dept.slug) }}"><span class="eyebrow">Next department →</span><strong>{{ next_dept.name }}</strong></a>{% else %}<a href="{{ url_for('public.warehouse') }}"><span class="eyebrow">Back to →</span><strong>The warehouse</strong></a>{% endif %}
+</nav>
+{% endblock %}

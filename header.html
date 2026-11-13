@@ -1,0 +1,35 @@
+{% set ep = request.endpoint or '' %}
+<header class="site-header{% block header_class %}{% endblock %}{% if header_dark %} on-dark{% endif %}" id="site-header">
+  <div class="wrap site-header__in">
+    <a class="logo" href="{{ url_for('public.home') }}" aria-label="PBF Studio — return to reception" data-reception>
+      <span>PBF Studio</span><span class="logo__bar" aria-hidden="true"></span><small>Independent Creative Studio</small>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="{{ url_for('public.home') }}" {% if ep == 'public.home' %}aria-current="page"{% endif %}>Reception</a>
+      <a href="{{ url_for('public.warehouse') }}" {% if ep == 'public.warehouse' or ep in ('public.department','public.project') %}aria-current="page"{% endif %}>Warehouse</a>
+      <a href="{{ url_for('public.work') }}" {% if ep == 'public.work' %}aria-current="page"{% endif %}>Work</a>
+      <a href="{{ url_for('public.services') }}" {% if ep == 'public.services' %}aria-current="page"{% endif %}>Services</a>
+      <a href="{{ url_for('public.about') }}" {% if ep == 'public.about' %}aria-current="page"{% endif %}>About</a>
+      <a href="{{ url_for('public.contact') }}" {% if ep == 'public.contact' %}aria-current="page"{% endif %}>Contact</a>
+      <a class="btn btn--red btn--small" href="{{ url_for('enquiry.form') }}">Start a project</a>
+    </nav>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="mnav" id="menu-btn"><span>Menu</span><i aria-hidden="true"></i></button>
+  </div>
+</header>
+<div class="mnav" id="mnav" aria-label="Menu" role="dialog" aria-modal="false">
+  <nav class="mnav__main" aria-label="Mobile primary">
+    <a href="{{ url_for('public.home') }}" data-reception><span>00</span>Reception</a>
+    <a href="{{ url_for('public.warehouse') }}"><span>01</span>The Warehouse</a>
+    <a href="{{ url_for('public.work') }}"><span>02</span>Selected Work</a>
+    <a href="{{ url_for('public.services') }}"><span>03</span>Services</a>
+    <a href="{{ url_for('public.about') }}"><span>04</span>About</a>
+    <a href="{{ url_for('public.contact') }}"><span>05</span>Contact</a>
+  </nav>
+  <nav class="mnav__depts" aria-label="Departments">
+    {% for d in nav_departments %}<a href="{{ url_for('public.department', slug=d.slug) }}"><span>{{ '%02d'|format(d.number) }}</span>{{ d.name }}</a>{% endfor %}
+  </nav>
+  <div class="mnav__foot">
+    <a class="btn btn--red" href="{{ url_for('enquiry.form') }}">Start a project <span class="arrow">→</span></a>
+    {% if whatsapp_url %}<a class="btn btn--ghost-light" href="{{ whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>{% endif %}
+  </div>
+</div>

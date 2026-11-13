@@ -1,0 +1,21 @@
+{% extends "admin/base.html" %}
+{% block title %}First-run setup{% endblock %}
+{% block content %}
+<div class="login">
+  <div class="login__card">
+    <p class="adm__brand"><span>PBF Studio</span><i></i></p>
+    <h1>Create the first admin</h1>
+    <p class="muted" style="font-size:.9rem">This page only exists while no admin account has been created and a setup token is set on the server.</p>
+    {% if error %}<div class="flash flash--error" role="alert">{{ error }}</div>{% endif %}
+    <form method="post" autocomplete="off">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="field"><label for="t">Setup token</label><input class="input" id="t" name="token" type="password" required></div>
+      <div class="field"><label for="n">Your name</label><input class="input" id="n" name="name" maxlength="80"></div>
+      <div class="field"><label for="e">Email</label><input class="input" id="e" name="email" type="email" autocomplete="username" required></div>
+      <div class="field"><label for="p">Password <span class="opt">12+ characters, mixed case, with a number</span></label><input class="input" id="p" name="password" type="password" autocomplete="new-password" required minlength="12"></div>
+      <div class="field"><label for="p2">Repeat password</label><input class="input" id="p2" name="password2" type="password" autocomplete="new-password" required></div>
+      <button class="btn btn--red" type="submit" style="width:100%">Create admin</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

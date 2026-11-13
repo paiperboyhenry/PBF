@@ -1,0 +1,101 @@
+{% extends "admin/base.html" %}
+{% from "partials/admin_macros.html" import csrf %}
+{% from "partials/macros.html" import picture %}
+{% block title %}{{ project.title if project else 'New project' }}{% endblock %}
+{% macro v(name, default='') %}{{ values.get(name, default) if values else default }}{% endmacro %}
+{% macro e(name) %}{% if errors.get(name) %}<div class="err" role="alert">{{ errors[name] }}</div>{% endif %}{% endmacro %}
+{% block content %}
+{% set P = project %}
+{% set cur_dept = (values.get('department_id') if values and values.get('department_id') else (P.department_id if P else '')) | string %}
+{% set cur_type = values.get('project_type') if values and values.get('project_type') else (P.project_type if P else '') %}
+<header class="adm__head">
+  <div><a class="muted" href="{{ url_for('admin.projects') }}">← Projects</a><h1>{{ P.title if P else 'New project' }}</h1></div>
+  {% if P %}
+  <div class="actions">
+    <span class="pill pill--{{ P.status }}">{{ P.status|capitalize }}</span>
+    <a class="btn btn--small btn--ghost" href="{{ url_for('public.project', slug=P.dept_slug, project_slug=P.slug) }}" target="_blank" rel="noopener" data-no-transition>Preview</a>
+    {% if P.status == 'published' %}
+    <form method="post" action="{{ url_for('admin.project_unpublish', pid=P.id) }}" class="inline">{{ csrf() }}<button class="btn btn--small btn--ghost">Unpublish</button></form>
+    {% else %}
+    <form method="post" action="{{ url_for('admin.project_publish', pid=P.id) }}" class="inline">{{ csrf() }}<button class="btn btn--small btn--red">Publish</button></form>
+    {% endif %}
+    <a class="btn btn--small btn--ghost" href="{{ url_for('admin.project_delete', pid=P.id) }}">Delete</a>
+  </div>
+  {% endif %}
+</header>
+
+<form method="post" enctype="multipart/form-data" class="card form" novalidate>
+  {{ csrf() }}
+  <div class="grid2">
+    <div class="field{% if errors.get('department_id') %} has-error{% endif %}"><label for="department_id">Department</label>
+      <select class="select" id="department_id" name="department_id" required data-cats='{{ dept_categories|tojson|forceescape }}'>
+        <option value="">Choose…</option>{% for d in departments %}<option value="{{ d.id }}" {% if cur_dept == d.id|string %}selected{% endif %}>{{ '%02d'|format(d.number) }} · {{ d.name }}</option>{% endfor %}
+      </select>{{ e('department_id') }}</div>
+    <div class="field{% if errors.get('category') %} has-error{% endif %}"><label for="category">Category <span class="opt">optional</span></label>
+      <select class="select" id="category" name="category" data-current="{{ values.get('category') if values and 'category' in values else (P.category if P else '') }}"><option value="">None</option></select>{{ e('category') }}</div>
+  </div>
+  <div class="field{% if errors.get('title') %} has-error{% endif %}"><label for="title">Project title</label><input class="input" id="title" name="title" value="{{ v('title', P.title if P else '') }}" required maxlength="140">{{ e('title') }}</div>
+  <div class="grid2">
+    <div class="field"><label for="client_name">Client or brand name <span class="opt">optional</span></label><input class="input" id="client_name" name="client_name" value="{{ v('client_name', P.client_name if P else '') }}" maxlength="140"></div>
+    <div class="field{% if errors.get('project_date') %} has-error{% endif %}"><label for="project_date">Project date <span class="opt">optional</span></label><input class="input" id="project_date" name="project_date" type="date" value="{{ v('project_date', P.project_date if P and P.project_date else '') }}">{{ e('project_date') }}</div>
+  </div>
+  <div class="field{% if errors.get('project_type') %} has-error{% endif %}"><span class="lab">Project type</span>
+    <div class="options">
+      {% for key, lab, help in (('client','Client project','Made for a paying client.'),('concept','Concept project','Created as a concept. Not made for a paying client.'),('personal','Personal experiment','Self-initiated exploration.')) %}
+      <label class="option"><input type="radio" name="project_type" value="{{ key }}" {% if cur_type == key %}checked{% endif %} required><span><span><strong>{{ lab }}</strong><br><small class="muted">{{ help }}</small></span></span></label>{% endfor %}
+    </div>{{ e('project_type') }}
+    <p class="muted" style="font-size:.82rem;margin:.6rem 0 0">This label is shown publicly on the project. Never mark concept work as a client project.</p></div>
+  <div class="field"><label for="description">Description</label><textarea class="textarea" id="description" name="description" maxlength="8000" style="min-height:11rem">{{ v('description', P.description if P else '') }}</textarea></div>
+  <div class="grid2">
+    <div class="field"><label for="services">Services delivered <span class="opt">one per line</span></label><textarea class="textarea" id="services" name="services" style="min-height:8rem">{{ (values.get('services') if values and 'services' in values else ((P.services|join('\n')) if P else '')) }}</textarea></div>
+    <div>
+      <div class="field{% if errors.get('external_url') %} has-error{% endif %}"><label for="external_url">External project link <span class="opt">optional</span></label><input class="input" id="external_url" name="external_url" value="{{ v('external_url', P.external_url if P else '') }}" placeholder="https://…">{{ e('external_url') }}</div>
+      <div class="field"><label for="slug">Web address <span class="opt">optional · auto-generated from the title</span></label><input class="input" id="slug" name="slug" value="{{ v('slug', P.slug if P else '') }}" maxlength="80" placeholder="my-project"></div>
+    </div>
+  </div>
+
+  <h2 class="adm__h2" id="media-upload">Media</h2>
+  <p class="muted" style="font-size:.85rem;margin-top:-.4rem">Images are checked, stripped of metadata and compressed to WebP automatically (max {{ max_image_mb }} MB each). Videos: MP4 or WebM up to {{ max_video_mb }} MB, or paste a YouTube / Vimeo link.</p>
+  <div class="grid2">
+    <div class="field"><label for="cover">Cover image {% if P and P.cover %}<span class="opt">replaces the current cover</span>{% else %}<span class="opt">required to publish</span>{% endif %}</label><input class="input" id="cover" name="cover" type="file" accept="image/jpeg,image/png,image/webp"></div>
+    <div class="field"><label for="cover_alt">Cover description <span class="opt">for screen readers</span></label><input class="input" id="cover_alt" name="cover_alt" maxlength="200" value="{{ P.cover.alt if P and P.cover else '' }}"></div>
+  </div>
+  <div class="field"><label for="gallery">Project images <span class="opt">select several at once</span></label><input class="input" id="gallery" name="gallery" type="file" accept="image/jpeg,image/png,image/webp" multiple></div>
+  <div class="grid2">
+    <div class="field"><label for="video_url">Video link <span class="opt">YouTube or Vimeo</span></label><input class="input" id="video_url" name="video_url" placeholder="https://www.youtube.com/watch?v=…"></div>
+    <div class="field"><label for="video_title">Video title <span class="opt">optional</span></label><input class="input" id="video_title" name="video_title" maxlength="140"></div>
+  </div>
+  <div class="field"><label for="video_file">Or upload a video file</label><input class="input" id="video_file" name="video_file" type="file" accept="video/mp4,video/webm"></div>
+
+  <div class="formbar">
+    <button class="btn btn--red" type="submit">{{ 'Save changes' if P else 'Save as draft' }}</button>
+    <span class="muted" style="font-size:.85rem">{% if P %}Saving doesn’t change whether the project is published.{% else %}New projects start as drafts. Preview, then publish.{% endif %}</span>
+  </div>
+</form>
+
+{% if P %}
+<section class="card" id="media">
+  <h2 class="adm__h2">Current media</h2>
+  <h3 class="eyebrow muted">Cover</h3>
+  {% if P.cover %}
+  <div class="mcard mcard--cover"><div class="mimg">{{ picture(P.cover, sizes="320px") }}</div>
+    <form method="post" action="{{ url_for('admin.project_image_action', pid=P.id, iid=P.cover_id, action='delete') }}" class="inline">{{ csrf() }}<button class="btn btn--small btn--ghost">Remove cover</button></form></div>
+  {% else %}<p class="muted">No cover yet. Upload one above before publishing.</p>{% endif %}
+
+  <h3 class="eyebrow muted" style="margin-top:2rem">Gallery ({{ gallery|length }})</h3>
+  {% if gallery %}<div class="mgrid">
+    {% for g in gallery %}
+    <div class="mcard"><div class="mimg">{{ picture(g, sizes="220px") }}</div>
+      <form method="post" action="{{ url_for('admin.project_image_action', pid=P.id, iid=g.id, action='alt') }}" class="mrow">{{ csrf() }}<input class="input" name="alt" value="{{ g.alt }}" placeholder="Description" maxlength="200" aria-label="Image description"><button class="btn btn--small btn--ghost">Save</button></form>
+      <div class="mrow">
+        {% for act, lab in (('up','←'),('down','→'),('cover','Make cover'),('delete','Delete')) %}
+        <form method="post" action="{{ url_for('admin.project_image_action', pid=P.id, iid=g.id, action=act) }}" class="inline">{{ csrf() }}<button class="btn btn--small btn--ghost" {% if act in ('up','down') %}aria-label="Move {{ 'earlier' if act=='up' else 'later' }}"{% endif %}>{{ lab }}</button></form>{% endfor %}
+      </div></div>{% endfor %}
+  </div>{% else %}<p class="muted">No gallery images yet.</p>{% endif %}
+
+  <h3 class="eyebrow muted" style="margin-top:2rem">Videos ({{ videos|length }})</h3>
+  {% if videos %}<ul class="list list--plain">{% for vd in videos %}<li><span><strong>{{ vd.title or ('Uploaded video' if vd.kind == 'upload' else 'Video link') }}</strong><br><span class="muted">{{ vd.url }}{% if vd.kind == 'link' and not vd.embed %} · not a YouTube/Vimeo link; it will show as a plain link{% endif %}</span></span>
+    <form method="post" action="{{ url_for('admin.project_video_delete', pid=P.id, vid=vd.id) }}" class="inline">{{ csrf() }}<button class="btn btn--small btn--ghost">Remove</button></form></li>{% endfor %}</ul>{% else %}<p class="muted">No videos yet.</p>{% endif %}
+</section>
+{% endif %}
+{% endblock %}

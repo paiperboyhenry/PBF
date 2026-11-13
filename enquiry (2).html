@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block page_id %}enquiry{% endblock %}
+{% block head %}{% if turnstile_key %}<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>{% endif %}{% endblock %}
+{% block content %}
+{% macro err(name) %}<div class="err" data-err="{{ name }}" role="alert">{{ errors.get(name, '') }}</div>{% endmacro %}
+{% macro fld(name) %}{% if errors.get(name) %} has-error{% endif %}{% endmacro %}
+{% set sel_services = values.get('services') or [] %}
+<div class="wrap enq">
+  <aside class="enq__aside">
+    <p class="eyebrow muted" style="margin-bottom:1.4rem">Work with PBF</p>
+    <h1>Start a project</h1>
+    <p>Six short steps. Tell us what you’re looking to create, improve or achieve and we’ll come back to you personally.</p>
+    <div class="alt">
+      <span class="eyebrow muted">Prefer to chat?</span>
+      {% if whatsapp_url %}<a class="link" href="{{ whatsapp_url }}?text={{ 'Hello PBF Studio, I’d like to talk about a project.'|urlencode }}" target="_blank" rel="noopener">WhatsApp us <span class="arrow">→</span></a>{% endif %}
+      {% if site.contact_email %}<a class="link" href="mailto:{{ site.contact_email }}">{{ site.contact_email }}</a>{% endif %}
+      {% if not whatsapp_url and not site.contact_email %}<span class="muted" style="font-size:.9rem">This form is the best way to reach us.</span>{% endif %}
+    </div>
+  </aside>
+
+  <div>
+    <div id="form-panel">
+      {% if errors.get('_form') %}<div class="formerr" role="alert">{{ errors['_form'] }}</div>{% endif %}
+      <ol class="steps" id="steps" aria-hidden="true">{% for i in range(6) %}<li></li>{% endfor %}</ol>
+      <div class="stepmeta" aria-live="polite"><span id="step-label">Step 1 of 6</span><span id="step-name">Contact</span></div>
+      <div class="formerr" id="form-error" role="alert" hidden></div>
+
+      <form id="enquiry-form" method="post" action="{{ url_for('enquiry.submit') }}" enctype="multipart/form-data" novalidate data-max-files="{{ max_attachments }}" data-max-mb="{{ max_attachment_mb }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="ft" value="{{ form_token }}">
+        <div class="hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+
+        <fieldset class="fstep is-current" data-step="1" data-name="Contact">
+          <legend>Who are we speaking to?</legend>
+          <p class="hint">So we know who to reply to.</p>
+          <div class="grid2">
+            <div class="field{{ fld('full_name') }}"><label for="f-name">Full name</label><input class="input" id="f-name" name="full_name" autocomplete="name" required maxlength="120" value="{{ values.get('full_name','') }}">{{ err('full_name') }}</div>
+            <div class="field"><label for="f-biz">Business or brand name <span class="opt">optional</span></label><input class="input" id="f-biz" name="business_name" autocomplete="organization" maxlength="160" value="{{ values.get('business_name','') }}"></div>
+          </div>
+          <div class="grid2">
+            <div class="field{{ fld('email') }}"><label for="f-email">Email address</label><input class="input" id="f-email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="254" value="{{ values.get('email','') }}">{{ err('email') }}</div>
+            <div class="field{{ fld('whatsapp') }}"><label for="f-wa">WhatsApp number <span class="opt">optional</span></label><input class="input" id="f-wa" name="whatsapp" type="tel" autocomplete="tel" inputmode="tel" placeholder="+254…" maxlength="40" value="{{ values.get('whatsapp','') }}">{{ err('whatsapp') }}</div>
+          </div>
+          <div class="field"><label for="f-country">Country <span class="opt">optional</span></label><input class="input" id="f-country" name="country" autocomplete="country-name" maxlength="80" value="{{ values.get('country','') }}"></div>
+        </fieldset>
+
+        <fieldset class="fstep" data-step="2" data-name="Services">
+          <legend>What do you need?</legend>
+          <p class="hint">Choose everything that applies.</p>
+          <div class="options field{{ fld('services') }}" style="margin-bottom:.6rem">
+            {% for s in services %}<label class="option"><input type="checkbox" name="services" value="{{ s }}" {% if s in sel_services %}checked{% endif %}><span>{{ s }}</span></label>{% endfor %}
+          </div>
+          {{ err('services') }}
+          <div class="field{{ fld('service_other') }}" id="other-wrap" style="margin-top:1.4rem" {% if 'Other' not in sel_services %}hidden{% endif %}><label for="f-other">Tell us what else you need</label><input class="input" id="f-other" name="service_other" maxlength="200" value="{{ values.get('service_other','') }}">{{ err('service_other') }}</div>
+        </fieldset>
+
+        <fieldset class="fstep" data-step="3" data-name="Project">
+          <legend>About your project</legend>
+          <p class="hint">Tell us about your project. What are you looking to create, improve or achieve?</p>
+          <div class="field{{ fld('description') }}"><label class="sr-only" for="f-desc">Project description</label><textarea class="textarea" id="f-desc" name="description" required minlength="20" maxlength="5000" placeholder="The business, the goal, anything that’s on your mind…">{{ values.get('description','') }}</textarea>{{ err('description') }}</div>
+        </fieldset>
+
+        <fieldset class="fstep" data-step="4" data-name="Budget">
+          <legend>Budget</legend>
+          <p class="hint">Optional. A range helps us suggest the right approach. “Not sure yet” is a perfectly good answer.</p>
+          <div class="options field{{ fld('budget') }}">
+            {% for b in budgets %}<label class="option"><input type="radio" name="budget" value="{{ b }}" {% if values.get('budget') == b %}checked{% endif %}><span>{{ b }}</span></label>{% endfor %}
+          </div>
+          {{ err('budget') }}
+        </fieldset>
+
+        <fieldset class="fstep" data-step="5" data-name="Timeline">
+          <legend>Timeline</legend>
+          <p class="hint">When would you like to get started?</p>
+          <div class="options field{{ fld('timeline') }}">
+            {% for t in timelines %}<label class="option"><input type="radio" name="timeline" value="{{ t }}" {% if values.get('timeline') == t %}checked{% endif %}><span>{{ t }}</span></label>{% endfor %}
+          </div>
+          {{ err('timeline') }}
+        </fieldset>
+
+        <fieldset class="fstep" data-step="6" data-name="Details">
+          <legend>Anything else?</legend>
+          <p class="hint">Optional. References help us see what you see.</p>
+          <div class="field{{ fld('reference_links') }}"><label for="f-links">Reference links <span class="opt">one per line</span></label><textarea class="textarea" id="f-links" name="reference_links" style="min-height:6rem" maxlength="1800" placeholder="https://…">{{ values.get('reference_links') | join('\n') if values.get('reference_links') else '' }}</textarea>{{ err('reference_links') }}</div>
+          <div class="field{{ fld('attachments') }}"><label for="f-files">Attachments <span class="opt">optional · up to {{ max_attachments }} files · JPG, PNG, WebP or PDF · {{ max_attachment_mb }} MB each</span></label><input class="input" id="f-files" name="attachments" type="file" multiple accept="image/jpeg,image/png,image/webp,application/pdf">{{ err('attachments') }}</div>
+          <div class="field"><label for="f-notes">Additional notes <span class="opt">optional</span></label><textarea class="textarea" id="f-notes" name="extra_notes" style="min-height:6rem" maxlength="3000">{{ values.get('extra_notes','') }}</textarea></div>
+          {% if turnstile_key %}<div class="cf-turnstile" data-sitekey="{{ turnstile_key }}" style="margin-bottom:1.2rem"></div>{% endif %}
+          <div id="review" hidden><h3 class="eyebrow muted" style="margin-bottom:.8rem">Review</h3><dl class="review" id="review-list"></dl></div>
+        </fieldset>
+
+        <div class="fnav">
+          <button class="btn btn--ghost" type="button" id="btn-back" hidden>← Back</button>
+          <button class="btn" type="button" id="btn-next" hidden>Next <span class="arrow">→</span></button>
+          <button class="btn btn--red" type="submit" id="btn-send">Send enquiry <span class="arrow">→</span></button>
+        </div>
+      </form>
+    </div>
+
+    <div id="done" hidden aria-live="polite" tabindex="-1">
+      <p class="eyebrow muted" style="margin-bottom:1.2rem">Enquiry received</p>
+      <h2 class="display" style="font-size:clamp(2.2rem,6vw,4.4rem)">Thank you. We’ve got it.</h2>
+      <p class="prose" style="margin-top:1.4rem">Your enquiry has been saved. We’ll read it properly and reply personally.</p>
+      <span class="ref" id="done-ref" style="display:inline-block;margin:1.4rem 0 1rem;padding:.7rem 1rem;border:1px solid var(--ink);font:600 .8rem/1 var(--f-sans);letter-spacing:.18em"></span>
+      <p class="muted" id="done-mail" hidden>A confirmation has been sent to your email.</p>
+      <div class="actions" style="display:flex;flex-wrap:wrap;gap:.8rem;margin-top:1.6rem">
+        <a class="btn btn--red" id="done-wa" href="#" target="_blank" rel="noopener" hidden>Follow up on WhatsApp</a>
+        <a class="btn btn--ghost" href="{{ url_for('public.warehouse') }}">Explore the warehouse</a>
+        <a class="btn btn--ghost" href="{{ url_for('public.home') }}" data-reception>Back to reception</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block footer %}{% include "partials/footer.html" %}{% endblock %}
+{% block scripts %}<script src="{{ static_v('js/enquiry.js') }}" defer></script>{% endblock %}

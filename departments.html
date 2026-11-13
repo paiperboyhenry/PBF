@@ -1,0 +1,18 @@
+{% extends "admin/base.html" %}
+{% from "partials/admin_macros.html" import csrf %}
+{% from "partials/macros.html" import picture %}
+{% block title %}Departments{% endblock %}
+{% block content %}
+<header class="adm__head"><h1>Departments</h1></header>
+<p class="muted" style="max-width:40rem">The six departments are fixed. You can edit how they’re described, give each a cover image, change their order and hide one from the public site.</p>
+<div class="card card--flush"><table class="tbl tbl--rows"><thead><tr><th>Department</th><th>Visible</th><th class="r">Published</th><th class="r">Drafts</th><th class="r">Order</th><th></th></tr></thead><tbody>
+{% for d in departments %}{% set c = counts[d.id] %}
+<tr>
+  <td><a href="{{ url_for('admin.department_edit', did=d.id) }}"><strong>{{ '%02d'|format(d.number) }} · {{ d.name }}</strong></a>{% if d.theme == 'atelier' %} <span class="muted">· atelier</span>{% endif %}</td>
+  <td><form method="post" action="{{ url_for('admin.department_visibility', did=d.id) }}" class="inline">{{ csrf() }}<button class="pill pill--{{ 'published' if d.is_visible else 'draft' }}" style="cursor:pointer">{{ 'Visible' if d.is_visible else 'Hidden' }}</button></form></td>
+  <td class="r">{{ c.published }}</td><td class="r">{{ c.drafts }}</td>
+  <td class="r nowrap">{% for dir, sym, lab in (('up','↑','Move up'),('down','↓','Move down')) %}<form method="post" action="{{ url_for('admin.department_move', did=d.id) }}" class="inline">{{ csrf() }}<input type="hidden" name="direction" value="{{ dir }}"><button class="icon" aria-label="{{ lab }}: {{ d.name }}">{{ sym }}</button></form>{% endfor %}</td>
+  <td class="r nowrap"><a class="btn btn--small btn--ghost" href="{{ url_for('public.department', slug=d.slug) }}" target="_blank" rel="noopener" data-no-transition>View</a> <a class="btn btn--small" href="{{ url_for('admin.department_edit', did=d.id) }}">Edit</a></td>
+</tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}

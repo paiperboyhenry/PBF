@@ -1,0 +1,13 @@
+{% extends "admin/base.html" %}
+{% from "partials/admin_macros.html" import csrf %}
+{% block title %}Delete project{% endblock %}
+{% block content %}
+<header class="adm__head"><h1>Delete project</h1></header>
+<form method="post" class="card" style="max-width:36rem">
+  {{ csrf() }}
+  <p>You are about to permanently delete <strong>{{ project.title }}</strong> from {{ project.dept_name }}. Its images and videos will be removed too. This can’t be undone.</p>
+  <p class="muted" style="font-size:.9rem">If you only want to hide it, unpublish it instead.</p>
+  <div class="field"><label for="ct">Type the project title to confirm</label><input class="input" id="ct" name="confirm_title" autocomplete="off" required></div>
+  <div class="actions"><button class="btn btn--red" type="submit">Delete permanently</button><a class="btn btn--ghost" href="{{ url_for('admin.project_edit', pid=project.id) }}">Cancel</a></div>
+</form>
+{% endblock %}
